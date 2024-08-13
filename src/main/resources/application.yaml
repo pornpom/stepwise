@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: ${APP_NAME:stepwise-service}
+  datasource:
+    url: jdbc:postgresql://${config-postgres-url:localhost}:${config-postgres-port:5432}/${config-postgres-schema:postgres}?prepareThreshold=0
+    username: ${SECRET_POSTGRES_USER:postgres}
+    password: ${SECRET_POSTGRES_PASSWORD:password@1}
+    hikari:
+      leakDetectionThreshold: 60000
+      minimum-idle: 1
+      maximum-pool-size: 5
+    tomcat:
+      max-wait: 20000
+      max-active: 50
+      max-idle: 20
+      min-idle: 15
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: none
+    database-platform: transaction
+    properties:
+      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+server:
+  port: 8080
+  servlet:
+    context-path: /${APP_NAME:stepwise-service}
+
+
+
