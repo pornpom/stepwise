@@ -23,7 +23,7 @@ public class SecurityConfig  {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/api/login").permitAll() // Public endpoints
+                                .requestMatchers("/api/login" , "/api/refresh").permitAll() // Public endpoints
                                 .anyRequest().authenticated() // Protected endpoints
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class); // Add the custom filter before the default one

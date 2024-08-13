@@ -5,6 +5,7 @@ import com.stepwise.stepwise.entity.ConfUserEntity;
 import com.stepwise.stepwise.repository.ConfUserRepository;
 import com.stepwise.stepwise.utils.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -28,7 +29,7 @@ public class LoginService {
 
     }
 
-    public String login(ConfUserDto dto){
+    public ConfUserDto login(ConfUserDto dto){
             try{
 
                 BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(10);
@@ -37,12 +38,11 @@ public class LoginService {
 
                 ConfUserEntity  confUserEntity = confUserRepository.findFirstByUserUsernameAndStatus(username , "A");
                 if(confUserEntity != null &&  bCryptPasswordEncoder.matches(password,confUserEntity.getUserPassword())) {
-                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                    return   JwtUtil.generateToken(confUserEntity);
-
+                    ConfUserDto result = new ConfUserDto();
+                    result.setAccessToken(JwtUtil.generateToken(confUserEntity));
+                    result.setRefreshToken(JwtUtil.generateRefreshToken(confUserEntity));
+                    return result;
                 }
-
-
 
             }catch (Exception e){
                 e.printStackTrace();
@@ -50,4 +50,19 @@ public class LoginService {
 
             return null;
         }
+
+    public ConfUserDto refreshTokens(String refreshToken) {
+        if (JwtUtil.isTokenExpired(refreshToken)) {
+            throw new RuntimeException("Refresh token is expired");
+        }
+        String username = JwtUtil.extractUsername(refreshToken);
+        if(StringUtils.isNotEmpty(username)){
+            ConfUserEntity  confUserEntity = confUserRepository.findFirstByUserUsernameAndStatus(username , "A");
+            ConfUserDto result = new ConfUserDto();
+            result.setAccessToken(JwtUtil.generateToken(confUserEntity));
+            result.setRefreshToken(JwtUtil.generateRefreshToken(confUserEntity));
+            return result;
+        }
+       return null;
+    }
 }

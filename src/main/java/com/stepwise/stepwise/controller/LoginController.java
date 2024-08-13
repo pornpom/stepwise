@@ -10,10 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,8 +27,8 @@ public class LoginController {
     @PostMapping(value = "/login")
     public ResponseEntity<ResponseModel> login(@RequestBody ConfUserDto dto) {
         try {
-            String result =  loginService.login(dto);
-            if(StringUtils.isNotEmpty(result)){
+            ConfUserDto result =  loginService.login(dto);
+            if(result != null){
                 return HelperUtils.responseSuccess(result);
             }else{
                 return HelperUtils.responseError(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", "CAN NOT LOGIN");
@@ -40,5 +37,11 @@ public class LoginController {
         } catch ( Exception e) {
             return HelperUtils.responseError(HttpStatus.INTERNAL_SERVER_ERROR, "error", e.getMessage());
         }
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<ResponseModel> refresh(@RequestParam String refreshToken) {
+         ConfUserDto result =  loginService.refreshTokens(refreshToken);
+        return HelperUtils.responseSuccess(result);
     }
 }
