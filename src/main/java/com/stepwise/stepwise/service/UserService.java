@@ -1,13 +1,13 @@
 package com.stepwise.stepwise.service;
 
-import com.stepwise.stepwise.config.OauthUser;
 import com.stepwise.stepwise.dto.ConfUserDto;
 import com.stepwise.stepwise.entity.ConfUserEntity;
 import com.stepwise.stepwise.repository.ConfUserRepository;
-import com.stepwise.stepwise.utils.JwtUtil;
+import com.stepwise.stepwise.repository.JdbcTemplateRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -15,20 +15,19 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class UserService {
-    private final JwtUtil jwtUtil;
+    private final JdbcTemplateRepository jdbcTemplateRepository;
     private final ModelMapper modelMapper;
-
     private final ConfUserRepository confUserRepository;
 
-    public UserService(ConfUserRepository confUserRepository, ModelMapper modelMapper, JwtUtil jwtUtil) {
+    public UserService(ConfUserRepository confUserRepository, ModelMapper modelMapper, JdbcTemplateRepository jdbcTemplateRepository) {
         this.confUserRepository = confUserRepository;
         this.modelMapper = modelMapper;
-        this.jwtUtil = jwtUtil;
+
+        this.jdbcTemplateRepository = jdbcTemplateRepository;
     }
 
     public ConfUserDto saveUser(ConfUserDto dto){
 
-        Integer userId = OauthUser.oauthUserId();
         if(StringUtils.isNotEmpty(dto.getUserUsername()) && StringUtils.isNotEmpty(dto.getUserPassword())){
             if(dto.getUserId() == null){
                 // check username is already
@@ -46,4 +45,10 @@ public class UserService {
 
         return null;
     }
+
+    public Page<ConfUserDto> getListUser( ConfUserDto dto){
+        return jdbcTemplateRepository.getListUser(dto);
+    }
+
+
 }

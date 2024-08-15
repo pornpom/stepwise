@@ -1,5 +1,6 @@
 package com.stepwise.stepwise.entity;
 
+import com.stepwise.stepwise.config.OauthUser;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -57,13 +58,28 @@ public class ConfUserEntity {
     @Column(name = "identification_no")
     private String identificationNo;
 
+    @Column(name = "phone")
+    private String phone;
+
+    @Column(name = "annual_leave")
+    private Integer annualLeave;
+
+    @Column(name = "personal_leave")
+    private Integer personalLeave;
+
+    @Column(name = "medical_leave")
+    private Integer medicalLeave;
+
+
     @PrePersist
     public void prePersist() {
+        this.createBy = OauthUser.oauthUserId();
         this.createDt = new Date(System.currentTimeMillis());
     }
 
     @PreUpdate
     public void preUpdate() {
+        this.updateBy = OauthUser.oauthUserId();
         this.updateDt = new Date(System.currentTimeMillis());
     }
 }
